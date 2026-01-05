@@ -2,265 +2,300 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Quiz Toss System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Competition Master</title>
 
 <style>
-body{
-    font-family: Cambria, serif;
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background:#f4f6f9;
-    text-align:center;
     padding:20px;
-}
-
-h1{ margin-bottom:5px; }
-
-.colors{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:20px;
-    max-width:600px;
-    margin:20px auto;
-}
-
-.color-box{
-    padding:30px;
-    font-size:1.3rem;
-    font-weight:bold;
-    color:white;
-    cursor:pointer;
-    border-radius:12px;
-    box-shadow:0 4px 10px rgba(0,0,0,0.25);
-    transition:transform 0.2s;
-}
-
-.color-box:hover{
-    transform:scale(1.05);
-}
-
-.locked{
-    opacity:0.4;
-    pointer-events:none;
-}
-
-button{
-    padding:12px 25px;
-    font-size:1rem;
-    font-weight:bold;
-    border:none;
-    border-radius:6px;
-    background:#006400; /* default green */
-    color:white;
-    cursor:pointer;
-    transition: background 0.2s;
-}
-
-/* ✅ red state on shuffle */
-button.shuffling{
-    background:#b00000;
-}
-
-/* Overlay */
-#overlay{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.85);
-    display:none;
+    display:flex;
+    flex-direction:column;
     align-items:center;
-    justify-content:center;
 }
 
-#resultBox{
-    background:white;
-    padding:40px 50px;
-    border-radius:20px;
-    font-size:3rem;
-    font-weight:bold;
-    color:#8b0000;
-    box-shadow:0 0 30px gold;
+/* ✅ NEW: Top headings */
+.top-header{
+    width:100%;
+    max-width:1200px;
+    text-align:center;
+    margin-bottom:18px;
+}
+.top-header .line1{
+    font-size:2rem;
+    font-weight:800;
+    color:#0b1f66; /* dark blue 1 */
+    letter-spacing:0.5px;
+}
+.top-header .line2{
+    font-size:1.2rem;
+    font-weight:700;
+    color:#102a8c; /* dark blue 2 */
+    margin-top:4px;
+}
+.top-header .line3{
+    font-size:1.2rem;
+    font-weight:800;
+    color:#c1121f; /* red */
+    margin-top:4px;
 }
 
-/* ✅ NEW: History list */
-.history-wrap{
-    max-width:600px;
-    margin:15px auto 0;
-    text-align:left;
+/* ✅ NEW: Scoreboard heading */
+.scoreboard-title{
+    width:100%;
+    max-width:1200px;
+    text-align:center;
+    margin:10px 0 18px;
+    font-size:1.6rem;
+    font-weight:900;
+    color:#0a2a72; /* dark blue 3 */
+    letter-spacing:1px;
+}
+
+.timer-container, .team-card {
     background:white;
     border-radius:12px;
     box-shadow:0 4px 12px rgba(0,0,0,0.1);
-    padding:14px 18px;
 }
 
-.history-title{
+.timer-container {
+    padding:30px;
+    width:100%;
+    max-width:600px;
+    text-align:center;
+    margin-bottom:20px; /* slightly reduced because we add SCORE BOARD */
+    transition: background 0.4s;
+}
+
+#timer {
+    font-size:5rem;
     font-weight:bold;
-    color:#0b1f66;
-    margin-bottom:10px;
-    font-size:1.1rem;
-    letter-spacing:0.5px;
+    padding:10px;
+    border-radius:10px;
+    color:#000;
 }
 
-.history-list{
-    list-style:none;
-    padding:0;
-    margin:0;
+.timer-red {
+    background:#8b0000;
 }
 
-.history-list li{
-    padding:10px 8px;
-    border-bottom:1px solid #e7e7e7;
-    font-size:1.05rem;
+.timer-red #timer {
+    color:#fffacd;
+}
+
+.controls, .timer-select {
     display:flex;
-    justify-content:space-between;
-    gap:12px;
+    gap:10px;
+    justify-content:center;
+    margin-top:15px;
 }
 
-.history-list li:last-child{
-    border-bottom:none;
-}
-
-.badge{
-    display:inline-block;
-    padding:4px 10px;
-    border-radius:999px;
-    color:white;
+.btn {
+    padding:10px 18px;
     font-weight:bold;
-    font-size:0.95rem;
-    min-width:90px;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    color:white;
+}
+
+.btn-start { background:#28a745; }
+.btn-stop { background:#dc3545; }
+.btn-reset { background:#6c757d; }
+.btn-time { background:#007bff; }
+
+.teams-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
+    width:100%;
+    max-width:1200px;
+}
+
+.team-card {
+    padding:20px;
     text-align:center;
 }
 
-.match{
-    font-weight:900;
-    color:#006400;
+.team-name-input {
+    width:100%;
+    border:none;
+    border-bottom:2px solid #007bff;
+    font-size:1.3rem;
+    text-align:center;
+    font-weight:bold;
+    outline:none;
 }
+
+.team-score {
+    font-size:3rem;
+    color:#007bff;
+    margin:10px 0;
+}
+
+.score-buttons {
+    display:flex;
+    gap:6px;
+    justify-content:center;
+    flex-wrap:wrap;
+}
+
+.btn-score { background:#007bff; }
+.btn-minus { background:#dc3545; }
+.btn-zero { background:#6c757d; }
 </style>
 </head>
 
 <body>
 
-<h1>Quiz Toss</h1>
-<p>Captain selects a color → Toss revealed</p>
-
-<button id="shuffleBtn" onclick="resetToss()">🔀 Shuffle Toss</button>
-
-<div class="colors" id="colors"></div>
-
-<!-- ✅ NEW: History box (below buttons/grid) -->
-<div class="history-wrap">
-    <div class="history-title">Revealed List</div>
-    <ul class="history-list" id="historyList"></ul>
+<!-- ✅ NEW TOP HEADING -->
+<div class="top-header">
+    <div class="line1">Q-Battle</div>
+    <div class="line2">Inter UGA Quiz Competition - Organised By AUMSA.</div>
+    <div class="line3">Game 1 - Round 2</div>
 </div>
 
-<div id="overlay" onclick="closeOverlay()">
-    <div id="resultBox"></div>
+<div class="timer-container" id="timerBox">
+    <div id="status">Select Time & Start</div>
+    <div id="timer">000</div>
+
+    <div class="timer-select">
+        <button class="btn btn-time" onclick="setTimer(15)">15 Seconds</button>
+        <button class="btn btn-time" onclick="setTimer(10)">10 Seconds</button>
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-start" onclick="startTimer()">START</button>
+        <button class="btn btn-stop" onclick="stopTimer()">STOP</button>
+        <button class="btn btn-reset" onclick="resetTimer()">RESET</button>
+    </div>
+</div>
+
+<!-- ✅ NEW SCORE BOARD TITLE -->
+<div class="scoreboard-title">SCORE BOARD</div>
+
+<div class="teams-grid">
+<script>
+for(let i=1;i<=4;i++){
+document.write(`
+<div class="team-card">
+<input class="team-name-input" value="Team ${String.fromCharCode(64+i)}">
+<div class="team-score" id="score-team${i}">0</div>
+<div class="score-buttons">
+<button class="btn btn-score" onclick="updateScore('team${i}',10)">+10</button>
+<button class="btn btn-score" onclick="updateScore('team${i}',5)">+5</button>
+<button class="btn btn-minus" onclick="updateScore('team${i}',-5)">-5</button>
+<button class="btn btn-zero" onclick="resetScore('team${i}')">ZERO</button>
+</div>
+</div>`);
+}
+</script>
 </div>
 
 <script>
-/* ---------------- DATA ---------------- */
-const colors = [
-    {name:"RED", color:"#c0392b"},
-    {name:"BLUE", color:"#2980b9"},
-    {name:"GREEN", color:"#27ae60"},
-    {name:"YELLOW", color:"#f1c40f"},
-    {name:"PURPLE", color:"#8e44ad"},
-    {name:"ORANGE", color:"#e67e22"}
-];
+let selectedTime = 0;
+let timeLeft = 0;
+let timerInterval = null;
 
-const ALL_TOSS = ["M1-T","M1-O","M2-T","M2-O","M3-T","M3-O"];
-let remainingToss = [];
+const timerDisplay = document.getElementById("timer");
+const statusDisplay = document.getElementById("status");
+const timerBox = document.getElementById("timerBox");
 
-/* ---------------- ELEMENTS ---------------- */
-const colorsDiv = document.getElementById("colors");
-const overlay = document.getElementById("overlay");
-const resultBox = document.getElementById("resultBox");
-const shuffleBtn = document.getElementById("shuffleBtn");
-const historyList = document.getElementById("historyList");
-
-/* ---------------- AUDIO (COIN SOUND) ---------------- */
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-function playCoinSound(){
-    if(audioCtx.state === "suspended") audioCtx.resume();
-
+/* 🔔 Short bell (start) */
+function playStartBell(){
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-
-    osc.type = "triangle";
-    osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.2);
-
-    gain.gain.setValueAtTime(0.6, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
-
+    osc.frequency.value = 900;
+    gain.gain.value = 0.4;
     osc.connect(gain);
     gain.connect(audioCtx.destination);
-
     osc.start();
-    osc.stop(audioCtx.currentTime + 0.25);
+    osc.stop(audioCtx.currentTime + 0.4);
 }
 
-/* ---------------- LOGIC ---------------- */
-function randomPick(arr){
-    const index = Math.floor(Math.random() * arr.length);
-    return arr.splice(index,1)[0];
+/* 🔔 BIG TEMPLE / CHURCH BELL */
+function playBigBell(){
+    const osc1 = audioCtx.createOscillator();
+    const osc2 = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc1.type = "sine";
+    osc2.type = "triangle";
+
+    osc1.frequency.value = 420;
+    osc2.frequency.value = 210;
+
+    gain.gain.setValueAtTime(0.8, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 4);
+
+    osc1.connect(gain);
+    osc2.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc1.start();
+    osc2.start();
+    osc1.stop(audioCtx.currentTime + 4);
+    osc2.stop(audioCtx.currentTime + 4);
 }
 
-/* ✅ NEW: add to history list */
-function addHistory(colorName, colorHex, toss){
-    const li = document.createElement("li");
-    li.innerHTML = `
-        <span class="badge" style="background:${colorHex}">${colorName}</span>
-        <span>➜ <span class="match">${toss}</span></span>
-    `;
-    historyList.appendChild(li);
+function formatTime(t){
+    const sign = t < 0 ? "-" : "";
+    return sign + String(Math.abs(t)).padStart(3,"0");
 }
 
-function resetToss(){
-    shuffleBtn.classList.add("shuffling");
-    playCoinSound();
-
-    remainingToss = [...ALL_TOSS];
-    colorsDiv.innerHTML = "";
-
-    // ✅ clear old history on shuffle
-    historyList.innerHTML = "";
-
-    colors.forEach(c=>{
-        const div = document.createElement("div");
-        div.className = "color-box";
-        div.style.background = c.color;
-        div.innerText = c.name;
-
-        div.onclick = ()=>{
-            if(remainingToss.length === 0) return;
-
-            const toss = randomPick(remainingToss);
-            div.classList.add("locked");
-
-            // ✅ show overlay
-            resultBox.innerHTML = `
-                ${c.name}<br><br>
-                ➜ <span style="color:#006400">${toss}</span>
-            `;
-            overlay.style.display = "flex";
-
-            // ✅ add to history list
-            addHistory(c.name, c.color, toss);
-        };
-
-        colorsDiv.appendChild(div);
-    });
-
-    setTimeout(()=>{
-        shuffleBtn.classList.remove("shuffling");
-    }, 350);
+function setTimer(seconds){
+    selectedTime = seconds;
+    timeLeft = seconds;
+    timerDisplay.innerText = formatTime(timeLeft);
+    timerBox.classList.remove("timer-red");
+    statusDisplay.innerText = `Ready (${seconds}s)`;
 }
 
-function closeOverlay(){
-    overlay.style.display = "none";
+function startTimer(){
+    if(!selectedTime || timerInterval) return;
+    playStartBell();
+    statusDisplay.innerText = "Running";
+    timerInterval = setInterval(()=>{
+        timeLeft--;
+        timerDisplay.innerText = formatTime(timeLeft);
+
+        if(timeLeft === 0){
+            timerBox.classList.add("timer-red");
+            playBigBell();
+            statusDisplay.innerText = "TIME OVER!";
+        }
+    },1000);
 }
 
-/* Auto shuffle on load */
-resetToss();
+function stopTimer(){
+    clearInterval(timerInterval);
+    timerInterval = null;
+    statusDisplay.innerText = "Paused";
+}
+
+function resetTimer(){
+    clearInterval(timerInterval);
+    timerInterval = null;
+    timeLeft = selectedTime;
+    timerDisplay.innerText = formatTime(timeLeft);
+    timerBox.classList.remove("timer-red");
+    statusDisplay.innerText = "Reset";
+}
+
+let teamScores = { team1:0, team2:0, team3:0, team4:0 };
+
+function updateScore(team,value){
+    teamScores[team]+=value;
+    document.getElementById("score-"+team).innerText = teamScores[team];
+}
+
+function resetScore(team){
+    teamScores[team]=0;
+    document.getElementById("score-"+team).innerText = 0;
+}
 </script>
 
 </body>
