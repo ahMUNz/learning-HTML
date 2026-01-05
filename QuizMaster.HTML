@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Quiz Toss System</title>
+
+<style>
+body{
+    font-family: Cambria, serif;
+    background:#f4f6f9;
+    text-align:center;
+    padding:20px;
+}
+
+h1{ margin-bottom:5px; }
+
+.colors{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+    max-width:600px;
+    margin:20px auto;
+}
+
+.color-box{
+    padding:30px;
+    font-size:1.3rem;
+    font-weight:bold;
+    color:white;
+    cursor:pointer;
+    border-radius:12px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.25);
+    transition:transform 0.2s;
+}
+
+.color-box:hover{
+    transform:scale(1.05);
+}
+
+.locked{
+    opacity:0.4;
+    pointer-events:none;
+}
+
+button{
+    padding:12px 25px;
+    font-size:1rem;
+    font-weight:bold;
+    border:none;
+    border-radius:6px;
+    background:#006400; /* default green */
+    color:white;
+    cursor:pointer;
+    transition: background 0.2s;
+}
+
+/* ✅ red state on shuffle */
+button.shuffling{
+    background:#b00000;
+}
+
+/* Overlay */
+#overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.85);
+    display:none;
+    align-items:center;
+    justify-content:center;
+}
+
+#resultBox{
+    background:white;
+    padding:40px 50px;
+    border-radius:20px;
+    font-size:3rem;
+    font-weight:bold;
+    color:#8b0000;
+    box-shadow:0 0 30px gold;
+}
+
+/* ✅ NEW: History list */
+.history-wrap{
+    max-width:600px;
+    margin:15px auto 0;
+    text-align:left;
+    background:white;
+    border-radius:12px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    padding:14px 18px;
+}
+
+.history-title{
+    font-weight:bold;
+    color:#0b1f66;
+    margin-bottom:10px;
+    font-size:1.1rem;
+    letter-spacing:0.5px;
+}
+
+.history-list{
+    list-style:none;
+    padding:0;
+    margin:0;
+}
+
+.history-list li{
+    padding:10px 8px;
+    border-bottom:1px solid #e7e7e7;
+    font-size:1.05rem;
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+}
+
+.history-list li:last-child{
+    border-bottom:none;
+}
+
+.badge{
+    display:inline-block;
+    padding:4px 10px;
+    border-radius:999px;
+    color:white;
+    font-weight:bold;
+    font-size:0.95rem;
+    min-width:90px;
+    text-align:center;
+}
+
+.match{
+    font-weight:900;
+    color:#006400;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Quiz Toss</h1>
+<p>Captain selects a color → Toss revealed</p>
+
+<button id="shuffleBtn" onclick="resetToss()">🔀 Shuffle Toss</button>
+
+<div class="colors" id="colors"></div>
+
+<!-- ✅ NEW: History box (below buttons/grid) -->
+<div class="history-wrap">
+    <div class="history-title">Revealed List</div>
+    <ul class="history-list" id="historyList"></ul>
+</div>
+
+<div id="overlay" onclick="closeOverlay()">
+    <div id="resultBox"></div>
+</div>
+
+<script>
+/* ---------------- DATA ---------------- */
+const colors = [
+    {name:"RED", color:"#c0392b"},
+    {name:"BLUE", color:"#2980b9"},
+    {name:"GREEN", color:"#27ae60"},
+    {name:"YELLOW", color:"#f1c40f"},
+    {name:"PURPLE", color:"#8e44ad"},
+    {name:"ORANGE", color:"#e67e22"}
+];
+
+const ALL_TOSS = ["M1-T","M1-O","M2-T","M2-O","M3-T","M3-O"];
+let remainingToss = [];
+
+/* ---------------- ELEMENTS ---------------- */
+const colorsDiv = document.getElementById("colors");
+const overlay = document.getElementById("overlay");
+const resultBox = document.getElementById("resultBox");
+const shuffleBtn = document.getElementById("shuffleBtn");
+const historyList = document.getElementById("historyList");
+
+/* ---------------- AUDIO (COIN SOUND) ---------------- */
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playCoinSound(){
+    if(audioCtx.state === "suspended") audioCtx.resume();
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.2);
+
+    gain.gain.setValueAtTime(0.6, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.25);
+}
+
+/* ---------------- LOGIC ---------------- */
+function randomPick(arr){
+    const index = Math.floor(Math.random() * arr.length);
+    return arr.splice(index,1)[0];
+}
+
+/* ✅ NEW: add to history list */
+function addHistory(colorName, colorHex, toss){
+    const li = document.createElement("li");
+    li.innerHTML = `
+        <span class="badge" style="background:${colorHex}">${colorName}</span>
+        <span>➜ <span class="match">${toss}</span></span>
+    `;
+    historyList.appendChild(li);
+}
+
+function resetToss(){
+    shuffleBtn.classList.add("shuffling");
+    playCoinSound();
+
+    remainingToss = [...ALL_TOSS];
+    colorsDiv.innerHTML = "";
+
+    // ✅ clear old history on shuffle
+    historyList.innerHTML = "";
+
+    colors.forEach(c=>{
+        const div = document.createElement("div");
+        div.className = "color-box";
+        div.style.background = c.color;
+        div.innerText = c.name;
+
+        div.onclick = ()=>{
+            if(remainingToss.length === 0) return;
+
+            const toss = randomPick(remainingToss);
+            div.classList.add("locked");
+
+            // ✅ show overlay
+            resultBox.innerHTML = `
+                ${c.name}<br><br>
+                ➜ <span style="color:#006400">${toss}</span>
+            `;
+            overlay.style.display = "flex";
+
+            // ✅ add to history list
+            addHistory(c.name, c.color, toss);
+        };
+
+        colorsDiv.appendChild(div);
+    });
+
+    setTimeout(()=>{
+        shuffleBtn.classList.remove("shuffling");
+    }, 350);
+}
+
+function closeOverlay(){
+    overlay.style.display = "none";
+}
+
+/* Auto shuffle on load */
+resetToss();
+</script>
+
+</body>
+</html>
