@@ -1,126 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blue Page</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Navy Page</title>
 
 <style>
-body{
+  body{
     margin:0;
     min-height:100vh;
     display:flex;
     justify-content:center;
     align-items:center;
-    background:#0a3cff;
+    background:#001f3f; /* navy blue */
     font-family: Arial, sans-serif;
-}
+    padding:18px;
+  }
 
-.container{
-    background:#0a3cff;
-    border:4px solid red;
+  .card{
+    width:100%;
+    max-width:520px;
+    border:4px solid #ff0000; /* red border */
     border-radius:16px;
-    padding:20px;
-    width:90%;
-    max-width:420px;
+    padding:18px;
     text-align:center;
-    color:white;
-    box-shadow:0 8px 20px rgba(0,0,0,0.4);
-}
+    color:#ffffff;
+    box-shadow:0 10px 26px rgba(0,0,0,0.45);
+    background:rgba(255,255,255,0.06);
+    backdrop-filter: blur(2px);
+  }
 
-img{
-    max-width:100%;
-    border-radius:12px;
-    margin-top:10px;
-    display:none;
-}
-
-h1{
-    margin:10px 0;
+  h1{
+    margin:6px 0 14px;
     font-size:1.6rem;
-}
+    line-height:1.2;
+  }
 
-input[type="file"]{
+  .img{
+    width:100%;
+    border-radius:12px;
+    display:block;
     margin:10px 0;
-    color:white;
-}
+    border:2px solid rgba(255,255,255,0.25);
+  }
 
-button{
-    margin-top:15px;
-    padding:14px 24px;
-    font-size:1.1rem;
-    font-weight:bold;
-    background:#00a000;
-    color:white;
+  .btn-row{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin-top:14px;
+  }
+
+  button{
+    padding:12px 18px;
+    font-size:1.05rem;
+    font-weight:800;
     border:none;
-    border-radius:8px;
+    border-radius:10px;
     cursor:pointer;
-}
+  }
 
-button:hover{
-    background:#008000;
-}
+  .btn-green{ background:#00a000; color:#fff; }
+  .btn-green:hover{ background:#008a00; }
 
-#message{
-    margin-top:15px;
-    font-size:1.1rem;
-    font-weight:bold;
-    color:yellow;
+  .btn-red{ background:#c1121f; color:#fff; }
+  .btn-red:hover{ background:#a10f19; }
+
+  #revealArea{
     display:none;
-}
+    margin-top:10px;
+  }
+
+  #message{
+    display:none;
+    margin-top:12px;
+    font-size:1.15rem;
+    font-weight:900;
+    color:#ffeb3b;
+    line-height:1.35;
+    word-break:break-word;
+  }
 </style>
 </head>
 
 <body>
-
-<div class="container">
+  <div class="card">
     <h1>Hey Inzi, how is this?</h1>
 
-    <input type="file" accept="image/*" onchange="loadImage(event)">
-    <img id="preview">
+    <!-- ✅ Image shown immediately (put photo1.jpg in same folder) -->
+    <img class="img" id="img1" src="Inzzz.jpg" alt="Photo 1" />
 
-    <button onclick="touchMe()">Touch Me</button>
-
-    <div id="message">
-        Viladaame padida…<br>
-        Skills develop pannuda 💪
+    <div class="btn-row">
+      <button class="btn-green" id="touchBtn" onclick="touchMe()">Touch Me</button>
+      <button class="btn-red" id="homeBtn" onclick="goHome()" style="display:none;">Return to Home</button>
     </div>
-</div>
+
+    <!-- ✅ Revealed content after click -->
+    <div id="revealArea">
+      <img class="img" id="img2" src="20191115_173403.jpg" alt="Photo 2" />
+      <div id="message">
+        Viladaame padida…<br/>
+        Skills eh develop pannuda 💪
+      </div>
+    </div>
+  </div>
 
 <script>
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  // Safe "dramatic pain/alarm-ish" sound (not sexualized)
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-function playPainSound(){
+  function playDramaticSound(){
     if(audioCtx.state === "suspended") audioCtx.resume();
 
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
 
     osc.type = "sawtooth";
-    osc.frequency.setValueAtTime(500, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(180, audioCtx.currentTime + 0.4);
+    osc.frequency.setValueAtTime(650, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(180, audioCtx.currentTime + 0.45);
 
-    gain.gain.setValueAtTime(0.7, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+    gain.gain.setValueAtTime(0.75, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.45);
 
     osc.connect(gain);
     gain.connect(audioCtx.destination);
 
     osc.start();
-    osc.stop(audioCtx.currentTime + 0.4);
-}
+    osc.stop(audioCtx.currentTime + 0.45);
+  }
 
-function touchMe(){
-    playPainSound();
+  function touchMe(){
+    playDramaticSound();
+
+    // show reveal content
+    document.getElementById("revealArea").style.display = "block";
     document.getElementById("message").style.display = "block";
-}
 
-function loadImage(event){
-    const img = document.getElementById("preview");
-    img.src = URL.createObjectURL(event.target.files[0]);
-    img.style.display = "block";
-}
+    // show return button, hide touch if you want
+    document.getElementById("homeBtn").style.display = "inline-block";
+    document.getElementById("touchBtn").style.display = "none";
+  }
+
+  function goHome(){
+    // hide reveal content and show touch button again
+    document.getElementById("revealArea").style.display = "none";
+    document.getElementById("message").style.display = "none";
+
+    document.getElementById("homeBtn").style.display = "none";
+    document.getElementById("touchBtn").style.display = "inline-block";
+  }
 </script>
-
 </body>
 </html>
+
