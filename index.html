@@ -1,12 +1,126 @@
 <!DOCTYPE html>
-<!-- first deploy -->
-
-<html>
+<html lang="en">
 <head>
-  <title>Solace Learning</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blue Page</title>
+
+<style>
+body{
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#0a3cff;
+    font-family: Arial, sans-serif;
+}
+
+.container{
+    background:#0a3cff;
+    border:4px solid red;
+    border-radius:16px;
+    padding:20px;
+    width:90%;
+    max-width:420px;
+    text-align:center;
+    color:white;
+    box-shadow:0 8px 20px rgba(0,0,0,0.4);
+}
+
+img{
+    max-width:100%;
+    border-radius:12px;
+    margin-top:10px;
+    display:none;
+}
+
+h1{
+    margin:10px 0;
+    font-size:1.6rem;
+}
+
+input[type="file"]{
+    margin:10px 0;
+    color:white;
+}
+
+button{
+    margin-top:15px;
+    padding:14px 24px;
+    font-size:1.1rem;
+    font-weight:bold;
+    background:#00a000;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#008000;
+}
+
+#message{
+    margin-top:15px;
+    font-size:1.1rem;
+    font-weight:bold;
+    color:yellow;
+    display:none;
+}
+</style>
 </head>
+
 <body>
-  <h1>Hello, I am Solace 👋</h1>
-  <p>This is my first GitHub HTML page.</p>
+
+<div class="container">
+    <h1>Hey Inzi, how is this?</h1>
+
+    <input type="file" accept="image/*" onchange="loadImage(event)">
+    <img id="preview">
+
+    <button onclick="touchMe()">Touch Me</button>
+
+    <div id="message">
+        Viladaame padida…<br>
+        Skills develop pannuda 💪
+    </div>
+</div>
+
+<script>
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playPainSound(){
+    if(audioCtx.state === "suspended") audioCtx.resume();
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(180, audioCtx.currentTime + 0.4);
+
+    gain.gain.setValueAtTime(0.7, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.4);
+}
+
+function touchMe(){
+    playPainSound();
+    document.getElementById("message").style.display = "block";
+}
+
+function loadImage(event){
+    const img = document.getElementById("preview");
+    img.src = URL.createObjectURL(event.target.files[0]);
+    img.style.display = "block";
+}
+</script>
+
 </body>
 </html>
