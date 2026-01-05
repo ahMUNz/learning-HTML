@@ -12,7 +12,7 @@
     display:flex;
     justify-content:center;
     align-items:center;
-    background:#001f3f; /* navy blue */
+    background:#001f3f;
     font-family: Arial, sans-serif;
     padding:18px;
   }
@@ -20,36 +20,25 @@
   .card{
     width:100%;
     max-width:520px;
-    border:4px solid #ff0000; /* red border */
+    border:4px solid #ff0000;
     border-radius:16px;
     padding:18px;
     text-align:center;
     color:#ffffff;
     box-shadow:0 10px 26px rgba(0,0,0,0.45);
     background:rgba(255,255,255,0.06);
-    backdrop-filter: blur(2px);
   }
 
   h1{
     margin:6px 0 14px;
     font-size:1.6rem;
-    line-height:1.2;
   }
 
   .img{
     width:100%;
     border-radius:12px;
-    display:block;
-    margin:10px 0;
+    margin:12px 0;
     border:2px solid rgba(255,255,255,0.25);
-  }
-
-  .btn-row{
-    display:flex;
-    gap:10px;
-    justify-content:center;
-    flex-wrap:wrap;
-    margin-top:14px;
   }
 
   button{
@@ -59,13 +48,11 @@
     border:none;
     border-radius:10px;
     cursor:pointer;
+    margin-top:12px;
   }
 
   .btn-green{ background:#00a000; color:#fff; }
-  .btn-green:hover{ background:#008a00; }
-
   .btn-red{ background:#c1121f; color:#fff; }
-  .btn-red:hover{ background:#a10f19; }
 
   #revealArea{
     display:none;
@@ -73,44 +60,44 @@
   }
 
   #message{
-    display:none;
     margin-top:12px;
     font-size:1.15rem;
     font-weight:900;
     color:#ffeb3b;
     line-height:1.35;
-    word-break:break-word;
   }
 </style>
 </head>
 
 <body>
-  <div class="card">
-    <h1>Hey Inzi, how is this?</h1>
 
-    <!-- ✅ Image shown immediately (put photo1.jpg in same folder) -->
-    <img class="img" id="img1" src="inzi.jpeg" alt="Photo 1" />
+<div class="card">
+  <h1>Hey Inzi, how is this?</h1>
 
-    <div class="btn-row">
-      <button class="btn-green" id="touchBtn" onclick="touchMe()">Touch Me</button>
-      <button class="btn-red" id="homeBtn" onclick="goHome()" style="display:none;">Return to Home</button>
+  <!-- First image -->
+  <img class="img" src="inzi.jpg" alt="Inzi Photo">
+
+  <!-- Touch button -->
+  <button class="btn-green" id="touchBtn" onclick="touchMe()">Touch Me</button>
+
+  <!-- Revealed section -->
+  <div id="revealArea">
+    <img class="img" src="photo2.jpg" alt="Second Photo">
+
+    <div id="message">
+      Dai.. Bitch😁 Viladaame padida…<br>
+      Skills eh develop pannuda 💪
     </div>
 
-    <!-- ✅ Revealed content after click -->
-    <div id="revealArea">
-      <img class="img" id="img2" src="photo2.jpg" alt="Photo 2" />
-      <div id="message">
-        Doi.. Bitch😁 Viladaame nalla padida…<br/>
-        Skills eh develop pannuda 💪.
-      </div>
-    </div>
+    <!-- ✅ Return button is LAST -->
+    <button class="btn-red" onclick="goHome()">Return to Home</button>
   </div>
+</div>
 
 <script>
-  // Safe "dramatic pain/alarm-ish" sound (not sexualized)
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-  function playDramaticSound(){
+  function playSound(){
     if(audioCtx.state === "suspended") audioCtx.resume();
 
     const osc = audioCtx.createOscillator();
@@ -131,26 +118,16 @@
   }
 
   function touchMe(){
-    playDramaticSound();
-
-    // show reveal content
+    playSound();
     document.getElementById("revealArea").style.display = "block";
-    document.getElementById("message").style.display = "block";
-
-    // show return button, hide touch if you want
-    document.getElementById("homeBtn").style.display = "inline-block";
     document.getElementById("touchBtn").style.display = "none";
   }
 
   function goHome(){
-    // hide reveal content and show touch button again
     document.getElementById("revealArea").style.display = "none";
-    document.getElementById("message").style.display = "none";
-
-    document.getElementById("homeBtn").style.display = "none";
     document.getElementById("touchBtn").style.display = "inline-block";
   }
 </script>
+
 </body>
 </html>
-
